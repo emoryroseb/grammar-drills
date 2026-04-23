@@ -424,17 +424,15 @@ const BUILTIN = {"passages": [{"id": "p1", "title": "PASSAGE I — The Joys of W
 let data = { passages: [], standalones: [] };
 
 function loadData() {
+  // Always use builtin as the base so new passages always appear
+  data = JSON.parse(JSON.stringify(BUILTIN));
   try {
     const saved = JSON.parse(localStorage.getItem(STORE));
-    // Use saved data if it has content, otherwise use builtin
-    if (saved && (saved.passages.length || saved.standalones.length)) {
-      data = saved;
-    } else {
-      data = JSON.parse(JSON.stringify(BUILTIN));
+    // Only restore saved standalones on top of builtin
+    if (saved && saved.standalones && saved.standalones.length) {
+      data.standalones = saved.standalones;
     }
-  } catch(e) {
-    data = JSON.parse(JSON.stringify(BUILTIN));
-  }
+  } catch(e) {}
 }
 function saveData() { localStorage.setItem(STORE, JSON.stringify(data)); }
 loadData();
