@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grammar Drills</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;1,8..60,300&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --ink: #1a1208; --paper: #f5f0e8; --cream: #ede7d4; --rule: #c8bfa8;
+  --red: #b83232; --green: #2a6e3f; --gold: #c4993a; --blue: #2b4c8c;
+  --blue-light: rgba(43,76,140,0.10);
+}
+body {
+  background: var(--paper); color: var(--ink);
+  font-family: 'Source Serif 4', Georgia, serif; min-height: 100vh;
+  background-image: repeating-linear-gradient(0deg, transparent, transparent 27px, var(--rule) 27px, var(--rule) 28px);
+  background-attachment: fixed;
+}
+header {
+  background: var(--ink); color: var(--paper); padding: 15px 28px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200; box-shadow: 0 2px 14px rgba(0,0,0,0.4);
+}
+.logo { font-family: 'Source Serif 4', serif; font-size: 1.35rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 300; }
+.logo span { color: var(--gold); font-weight: 600; }
+.mode-toggle { display: flex; }
+.mode-btn {
+  font-family: 'Source Serif 4', serif; font-size: 0.76rem; text-transform: uppercase;
+  letter-spacing: .1em; padding: 7px 18px; cursor: pointer;
+  border: 1.5px solid rgba(255,255,255,0.22); background: transparent;
+  color: rgba(255,255,255,0.55); transition: all .15s;
+}
+.mode-btn:first-child { border-radius: 2px 0 0 2px; }
+.mode-btn:last-child  { border-radius: 0 2px 2px 0; border-left: none; }
+.mode-btn.active { background: var(--gold); color: var(--ink); border-color: var(--gold); font-weight: 600; }
+main { max-width: 820px; margin: 0 auto; padding: 34px 20px 90px; }
+
+/* ─── shared components ─── */
+.btn-primary { font-family:'Playfair Display',serif; font-size:.93rem; padding:10px 26px; background:var(--ink); color:var(--paper); border:none; cursor:pointer; border-radius:2px; letter-spacing:.05em; transition:background .15s; }
+.btn-primary:hover { background:#2e2515; }
+.btn-secondary { font-family:'Playfair Display',serif; font-size:.93rem; padding:10px 20px; background:transparent; color:var(--ink); border:1.5px solid var(--rule); cursor:pointer; border-radius:2px; transition:border-color .15s; }
+.btn-secondary:hover { border-color:var(--ink); }
+.btn-ghost { font-family:'Source Serif 4',serif; font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; padding:6px 14px; background:transparent; color:var(--gold); border:1.5px solid var(--gold); cursor:pointer; border-radius:2px; transition:all .12s; }
+.btn-ghost:hover { background:var(--gold); color:var(--ink); }
+.btn-danger { font-family:'Source Serif 4',serif; font-size:.78rem; padding:5px 10px; background:transparent; color:#a05050; border:1px solid #d4a0a0; cursor:pointer; border-radius:2px; transition:all .12s; }
+.btn-danger:hover { background:#faeaea; border-color:var(--red); color:var(--red); }
+.section-title { font-family:'Playfair Display',serif; font-size:1.5rem; font-style:italic; margin-bottom:5px; }
+.section-sub { font-size:.87rem; color:#7a6a50; margin-bottom:26px; line-height:1.6; }
+.hint { font-size:.77rem; color:#9a8a70; font-style:italic; margin-top:4px; }
+label.field-label { display:block; font-size:.73rem; text-transform:uppercase; letter-spacing:.09em; color:#7a6a50; margin-bottom:5px; }
+textarea, input[type=text], select {
+  width:100%; font-family:'Source Serif 4',serif; font-size:.94rem;
+  padding:9px 12px; border:1.5px solid var(--rule); background:var(--paper);
+  color:var(--ink); border-radius:2px; line-height:1.55; transition:border-color .12s;
+}
+textarea:focus, input[type=text]:focus, select:focus { outline:none; border-color:var(--ink); }
+textarea { resize:vertical; }
+.toast {
+  position:fixed; bottom:26px; left:50%; transform:translateX(-50%) translateY(80px);
+  background:var(--ink); color:var(--paper); padding:11px 22px; border-radius:2px;
+  font-size:.87rem; z-index:999; transition:transform .3s; pointer-events:none;
+  box-shadow:0 4px 16px rgba(0,0,0,.3);
+}
+.toast.show { transform:translateX(-50%) translateY(0); }
+
+/* ══════════════════════════════════════
+   TUTOR MODE
+══════════════════════════════════════ */
+#tutor-mode { display:block; }
+#student-mode { display:none; }
+
+/* passage card in bank */
+.passage-card {
+  background:#faf6ed; border:1px solid var(--rule); border-left:4px solid var(--ink);
+  margin-bottom:16px; border-radius:1px; overflow:hidden;
+}
+.passage-card-header {
+  display:flex; align-items:flex-start; gap:12px; padding:15px 18px;
+  cursor:pointer; user-select:none;
+}
+.passage-card-header:hover { background:#f3ece0; }
+.pch-body { flex:1; min-width:0; }
+.pch-title { font-family:'Playfair Display',serif; font-size:1rem; font-style:italic; }
+.pch-meta { font-size:.76rem; color:#9a8a70; margin-top:3px; }
+.pch-chevron { font-size:.8rem; color:#9a8a70; padding-top:3px; transition:transform .2s; }
+.pch-chevron.open { transform:rotate(90deg); }
+.passage-card-body { border-top:1px solid var(--rule); padding:16px 18px; display:none; }
+.passage-card-body.open { display:block; }
+.passage-preview {
+  background:var(--cream); border-left:3px solid var(--rule);
+  padding:12px 15px; font-size:.88rem; line-height:1.75; font-style:italic;
+  color:#3a2e18; margin-bottom:14px; max-height:120px; overflow:hidden;
+  position:relative;
+}
+.passage-preview::after { content:''; position:absolute; bottom:0; left:0; right:0; height:30px; background:linear-gradient(transparent, var(--cream)); }
+.questions-list { display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+.q-row {
+  display:flex; align-items:center; gap:10px; padding:10px 13px;
+  background:var(--paper); border:1px solid var(--rule); border-radius:2px;
+}
+.q-row-body { flex:1; min-width:0; }
+.q-row-stem { font-size:.88rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.q-row-meta { font-size:.73rem; color:#9a8a70; margin-top:2px; }
+.q-row-actions { display:flex; gap:5px; flex-shrink:0; }
+.icon-btn { background:transparent; border:1px solid var(--rule); padding:4px 9px; cursor:pointer; font-size:.78rem; color:#7a6a50; border-radius:2px; transition:all .12s; }
+.icon-btn:hover { border-color:var(--ink); color:var(--ink); }
+.icon-btn.del:hover { border-color:var(--red); color:var(--red); }
+.passage-card-footer { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+/* standalone bank */
+.standalone-section { margin-bottom:28px; }
+.standalone-section h4 { font-family:'Playfair Display',serif; font-size:1rem; font-style:italic; color:#6b5e48; margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--rule); }
+.empty-bank { text-align:center; padding:32px; border:2px dashed var(--rule); color:#a89878; font-style:italic; font-size:.9rem; border-radius:2px; margin-bottom:18px; }
+.bank-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+.bank-count { font-size:.8rem; color:#8a7a60; letter-spacing:.06em; text-transform:uppercase; }
+.add-btns { display:flex; gap:8px; }
+
+/* forms */
+.form-card { background:#faf6ed; border:1px solid var(--rule); border-top:4px solid var(--gold); padding:28px 30px; box-shadow:3px 3px 0 var(--rule); margin-bottom:22px; }
+.form-card h3 { font-family:'Playfair Display',serif; font-size:1.1rem; font-style:italic; margin-bottom:20px; }
+.form-fields { display:flex; flex-direction:column; gap:16px; }
+.field { display:flex; flex-direction:column; }
+.field-2col { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.choices-block { display:flex; flex-direction:column; gap:8px; }
+.choice-row { display:flex; align-items:center; gap:9px; }
+.choice-ltr { font-family:'Playfair Display',serif; font-weight:700; font-size:.9rem; color:#8a7a60; min-width:20px; text-align:center; }
+.choice-row input { flex:1; }
+.correct-row { display:flex; gap:7px; flex-wrap:wrap; }
+.correct-btn { font-family:'Playfair Display',serif; font-weight:700; padding:5px 13px; border:1.5px solid var(--rule); background:var(--paper); cursor:pointer; border-radius:2px; font-size:.88rem; color:#8a7a60; transition:all .12s; }
+.correct-btn.sel { background:var(--green); border-color:var(--green); color:#fff; }
+.btn-row { display:flex; gap:10px; margin-top:18px; flex-wrap:wrap; }
+.divider { border:none; border-top:1px solid var(--rule); margin:26px 0; }
+
+/* ══════════════════════════════════════
+   STUDENT MODE
+══════════════════════════════════════ */
+.progress-wrap { height:4px; background:var(--rule); margin-bottom:22px; border-radius:2px; overflow:hidden; }
+.progress-bar  { height:100%; background:var(--ink); transition:width .4s ease; }
+.s-top { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; flex-wrap:wrap; gap:10px; }
+.score-pill { font-size:.82rem; color:#6b5e48; }
+.score-pill strong { font-family:'Playfair Display',serif; font-size:1rem; color:var(--ink); }
+.cat-filter { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:20px; }
+.cf-btn { font-size:.72rem; text-transform:uppercase; letter-spacing:.08em; padding:5px 11px; border:1.5px solid var(--rule); background:transparent; color:#7a6a60; cursor:pointer; border-radius:2px; transition:all .12s; }
+.cf-btn:hover { border-color:var(--ink); color:var(--ink); }
+.cf-btn.active { background:var(--ink); color:var(--paper); border-color:var(--ink); }
+
+/* drill card */
+.drill-card { background:#faf6ed; border:1px solid var(--rule); border-top:4px solid var(--ink); padding:28px 32px; box-shadow:3px 3px 0 var(--rule); margin-bottom:18px; }
+.drill-meta { display:flex; align-items:center; gap:9px; margin-bottom:16px; flex-wrap:wrap; }
+.badge { font-size:.66rem; text-transform:uppercase; letter-spacing:.1em; padding:3px 8px; border-radius:1px; }
+.badge-passage { background:#dce8f5; color:#1a3560; border:1px solid #b0c8e8; }
+.badge-sentence { background:#e8f0dc; color:#2a4010; border:1px solid #b8d098; }
+.badge-cat { background:var(--cream); color:#5a4e38; border:1px solid var(--rule); }
+.q-counter { margin-left:auto; font-family:'Playfair Display',serif; font-style:italic; color:#a89878; font-size:.84rem; }
+
+.passage-display {
+  border-left:3px solid var(--rule); padding:14px 17px;
+  margin-bottom:18px; background:var(--cream); font-size:.97rem;
+  line-height:1.9; font-style:italic; color:#2c2416;
+}
+.tested-phrase {
+  text-decoration:underline; text-decoration-color:var(--blue);
+  text-decoration-thickness:2px; text-underline-offset:3px;
+  font-style:normal; color:var(--blue); background:var(--blue-light);
+  padding:0 2px; border-radius:2px;
+}
+.q-stem { font-size:1rem; line-height:1.65; margin-bottom:18px; }
+.choices-list { display:flex; flex-direction:column; gap:8px; }
+.choice-opt {
+  display:flex; align-items:flex-start; gap:12px; padding:11px 14px;
+  background:var(--paper); border:1.5px solid var(--rule); text-align:left;
+  cursor:pointer; border-radius:2px; font-family:'Source Serif 4',serif;
+  font-size:.95rem; line-height:1.5; color:var(--ink);
+  transition:border-color .12s, background .12s; width:100%;
+}
+.choice-opt:hover:not(:disabled) { border-color:var(--ink); background:var(--cream); }
+.choice-opt:disabled { cursor:default; }
+.opt-ltr { font-family:'Playfair Display',serif; font-weight:700; font-size:.87rem; color:#8a7a60; min-width:19px; padding-top:1px; }
+.choice-opt.correct { border-color:var(--green); background:#eaf5ee; }
+.choice-opt.correct .opt-ltr { color:var(--green); }
+.choice-opt.wrong   { border-color:var(--red);   background:#faeaea; }
+.choice-opt.wrong   .opt-ltr { color:var(--red); }
+.expl-box { margin-top:14px; padding:13px 17px; border-left:3px solid var(--gold); background:#fdf8ec; font-size:.9rem; line-height:1.72; color:#3a2e18; display:none; }
+.expl-box.show { display:block; }
+.next-q-btn { margin-top:18px; display:none; font-family:'Playfair Display',serif; font-size:.93rem; padding:10px 28px; background:var(--ink); color:var(--paper); border:none; cursor:pointer; border-radius:2px; letter-spacing:.05em; transition:background .15s; }
+.next-q-btn:hover { background:#2e2515; }
+.next-q-btn.show { display:inline-block; }
+
+/* passage progress bar (within a passage set) */
+.passage-progress { font-size:.76rem; color:#9a8a70; margin-bottom:14px; letter-spacing:.04em; }
+
+/* results */
+#results-screen { display:none; text-align:center; padding:48px 20px; }
+#results-screen h2 { font-family:'Playfair Display',serif; font-size:1.9rem; font-style:italic; margin-bottom:6px; }
+.final-score { font-family:'Playfair Display',serif; font-size:3.8rem; color:var(--gold); line-height:1; margin:16px 0; }
+.breakdown { max-width:430px; margin:22px auto; border:1px solid var(--rule); background:var(--cream); }
+.bd-row { display:flex; justify-content:space-between; align-items:center; padding:9px 15px; border-bottom:1px solid var(--rule); font-size:.89rem; }
+.bd-row:last-child { border-bottom:none; }
+.bd-pct { font-family:'Playfair Display',serif; font-weight:700; }
+.good { color:var(--green); } .ok { color:var(--gold); } .bad { color:var(--red); }
+.no-q { text-align:center; padding:56px 20px; border:2px dashed var(--rule); color:#a89878; font-style:italic; }
+.no-q p { margin-bottom:10px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Grammar <span>Drills</span></div>
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn-tutor" onclick="switchMode('tutor')">✏️ Tutor</button>
+    <button class="mode-btn" id="btn-student" onclick="switchMode('student')">📖 Student</button>
+  </div>
+</header>
+
+<main>
+
+<!-- ══ TUTOR ══ -->
+<div id="tutor-mode">
+  <div class="section-title">Question Bank</div>
+  <p class="section-sub">Add passages (with multiple questions each) or standalone sentences. Students see each passage once with the tested phrase highlighted, working through all its questions together.</p>
+
+  <div class="bank-top">
+    <span class="bank-count" id="bank-count">0 items</span>
+    <div class="add-btns">
+      <button class="btn-ghost" onclick="openPassageForm()">+ New Passage</button>
+      <button class="btn-ghost" onclick="openStandaloneForm()">+ Sentence Question</button>
+      <button class="btn-ghost" onclick="exportBank()">⬇ Export</button>
+      <label class="btn-ghost" style="cursor:pointer;">⬆ Import<input type="file" accept=".json" onchange="importBank(event)" style="display:none;"></label>
+    </div>
+  </div>
+
+  <!-- Passage bank -->
+  <div id="passage-bank"></div>
+
+  <!-- Standalone bank -->
+  <div class="standalone-section" id="standalone-section" style="display:none;">
+    <h4>Standalone Sentence Questions</h4>
+    <div id="standalone-bank"></div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- ── Passage form ── -->
+  <div class="form-card" id="passage-form" style="display:none;">
+    <h3 id="pf-title">New Passage</h3>
+    <div class="form-fields">
+      <div class="field">
+        <label class="field-label">Passage Title <span style="color:#9a8a70;">(for your reference)</span></label>
+        <input type="text" id="pf-title-input" placeholder="e.g., ACT April 2023 – Passage 1">
+      </div>
+      <div class="field">
+        <label class="field-label">Passage Text</label>
+        <textarea id="pf-text" rows="7" placeholder="Paste the full passage here. You'll mark individual tested phrases per question below."></textarea>
+        <p class="hint">Paste the full paragraph(s). Tested phrases will be highlighted individually for each question.</p>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="savePassage()">Save Passage & Add Questions</button>
+      <button class="btn-secondary" onclick="closePassageForm()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ── Question form (for a passage) ── -->
+  <div class="form-card" id="question-form" style="display:none;">
+    <h3 id="qf-title">Add Question</h3>
+    <div id="qf-passage-context" style="margin-bottom:14px; padding:10px 14px; background:var(--cream); border-left:3px solid var(--rule); font-size:.84rem; color:#5a4e38; font-style:italic; line-height:1.6; max-height:80px; overflow:hidden;"></div>
+    <div class="form-fields">
+      <div class="field">
+        <label class="field-label">Tested Phrase (the underlined portion)</label>
+        <input type="text" id="qf-tested" placeholder="Must match passage text exactly — it will be highlighted blue">
+      </div>
+      <div class="field">
+        <label class="field-label">Question Stem <span style="color:#9a8a70;">(optional)</span></label>
+        <input type="text" id="qf-stem" placeholder="Which of the following is the best version of the underlined portion?">
+      </div>
+      <div class="field">
+        <label class="field-label">Grammar Category</label>
+        <select id="qf-category">
+          <option value="Punctuation">Punctuation</option>
+          <option value="Subject-Verb Agreement">Subject-Verb Agreement</option>
+          <option value="Pronoun Agreement">Pronoun Agreement &amp; Case</option>
+          <option value="Verb Tense &amp; Mood">Verb Tense &amp; Mood</option>
+          <option value="Redundancy &amp; Wordiness">Redundancy &amp; Wordiness</option>
+          <option value="Transitions">Transitions &amp; Logical Flow</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Answer Choices</label>
+        <div class="choices-block">
+          <div class="choice-row"><span class="choice-ltr">A</span><input type="text" id="qc0" placeholder="Choice A"></div>
+          <div class="choice-row"><span class="choice-ltr">B</span><input type="text" id="qc1" placeholder="Choice B"></div>
+          <div class="choice-row"><span class="choice-ltr">C</span><input type="text" id="qc2" placeholder="Choice C"></div>
+          <div class="choice-row"><span class="choice-ltr">D</span><input type="text" id="qc3" placeholder="Choice D (optional)"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Correct Answer</label>
+        <div class="correct-row">
+          <button class="correct-btn" onclick="selCorrect(0)">A</button>
+          <button class="correct-btn" onclick="selCorrect(1)">B</button>
+          <button class="correct-btn" onclick="selCorrect(2)">C</button>
+          <button class="correct-btn" onclick="selCorrect(3)">D</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Explanation</label>
+        <textarea id="qf-expl" rows="3" placeholder="Why is this correct? Which rule applies?"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="saveQuestion()">Save Question</button>
+      <button class="btn-secondary" onclick="closeQuestionForm()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ── Standalone sentence form ── -->
+  <div class="form-card" id="standalone-form" style="display:none;">
+    <h3 id="sf-title">Sentence Question</h3>
+    <div class="form-fields">
+      <div class="field">
+        <label class="field-label">Sentence</label>
+        <textarea id="sf-sentence" rows="3" placeholder="Type the full sentence here."></textarea>
+      </div>
+      <div class="field">
+        <label class="field-label">Question Stem <span style="color:#9a8a70;">(optional)</span></label>
+        <input type="text" id="sf-stem" placeholder="Which of the following is the best version of the underlined portion?">
+      </div>
+      <div class="field">
+        <label class="field-label">Grammar Category</label>
+        <select id="sf-category">
+          <option value="Punctuation">Punctuation</option>
+          <option value="Subject-Verb Agreement">Subject-Verb Agreement</option>
+          <option value="Pronoun Agreement">Pronoun Agreement &amp; Case</option>
+          <option value="Verb Tense &amp; Mood">Verb Tense &amp; Mood</option>
+          <option value="Redundancy &amp; Wordiness">Redundancy &amp; Wordiness</option>
+          <option value="Transitions">Transitions &amp; Logical Flow</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label class="field-label">Answer Choices</label>
+        <div class="choices-block">
+          <div class="choice-row"><span class="choice-ltr">A</span><input type="text" id="sc0" placeholder="Choice A"></div>
+          <div class="choice-row"><span class="choice-ltr">B</span><input type="text" id="sc1" placeholder="Choice B"></div>
+          <div class="choice-row"><span class="choice-ltr">C</span><input type="text" id="sc2" placeholder="Choice C"></div>
+          <div class="choice-row"><span class="choice-ltr">D</span><input type="text" id="sc3" placeholder="Choice D (optional)"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Correct Answer</label>
+        <div class="correct-row">
+          <button class="correct-btn" onclick="selSCorrect(0)">A</button>
+          <button class="correct-btn" onclick="selSCorrect(1)">B</button>
+          <button class="correct-btn" onclick="selSCorrect(2)">C</button>
+          <button class="correct-btn" onclick="selSCorrect(3)">D</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">Explanation</label>
+        <textarea id="sf-expl" rows="3" placeholder="Why is this correct? Which rule applies?"></textarea>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="saveStandalone()">Save Question</button>
+      <button class="btn-secondary" onclick="closeStandaloneForm()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ STUDENT ══ -->
+<div id="student-mode" style="display:none;">
+  <div class="no-q" id="no-q-msg" style="display:none;">
+    <p>No questions in the bank yet.</p>
+    <p style="font-size:.84rem;">Switch to <strong>Tutor</strong> mode to add some first.</p>
+  </div>
+
+  <div id="drill-ui" style="display:none;">
+    <div class="s-top">
+      <span class="score-pill">Score: <strong id="s-score">0 / 0</strong></span>
+      <button class="btn-secondary" style="font-size:.76rem;padding:5px 12px;" onclick="resetDrill()">↺ Restart</button>
+    </div>
+    <div class="cat-filter" id="cat-filter"></div>
+    <div class="progress-wrap"><div class="progress-bar" id="s-progress" style="width:0%"></div></div>
+
+    <div class="drill-card" id="drill-card">
+      <div class="drill-meta">
+        <span class="badge" id="s-type-badge"></span>
+        <span class="badge badge-cat" id="s-cat-badge"></span>
+        <span class="q-counter" id="s-qnum"></span>
+      </div>
+      <div class="passage-progress" id="s-passage-progress" style="display:none;"></div>
+      <div id="s-passage-area"></div>
+      <div class="q-stem" id="s-stem"></div>
+      <div class="choices-list" id="s-choices"></div>
+      <div class="expl-box" id="s-expl"></div>
+      <button class="next-q-btn" id="s-next" onclick="nextQ()">Next Question →</button>
+    </div>
+
+    <div id="results-screen">
+      <h2>Drill Complete</h2>
+      <div class="final-score" id="final-score-txt"></div>
+      <div class="breakdown" id="breakdown"></div>
+      <button class="btn-primary" style="margin-top:14px;" onclick="resetDrill()">Try Again</button>
+    </div>
+  </div>
+</div>
+
+</main>
+<div class="toast" id="toast-el"></div>
+
+<script>
+// ═══════════════════════════════════════════════════
+// DATA MODEL
+// passages: [{ id, title, text, questions: [{id, tested, stem, category, choices[], correct, explanation}] }]
+// standalones: [{ id, sentence, stem, category, choices[], correct, explanation }]
+// ═══════════════════════════════════════════════════
+const STORE = 'grammar_drills_v3';
+
+const BUILTIN = {"passages":[{"id":"p1","title":"PASSAGE I — The Joys of Walking","text":"While some people are exhilarated by vigorous exercise, I am not. I love feeling fit, but I hate working out. I've tried dozens of different fitness activities, but all of them leave me bored, sore, or frustrated by my inability to do them well and how boring they were.\n\nFinally, I made a deal with myself. Each day I would try to find time for a half-hour walk. Fitting it into my schedule whenever I could. Running errands and visiting friends if I walked would take longer to my destination, but I consoled myself with virtuous thoughts of how my body could benefit from the effort.\n\nA funny thing happened on my way to fitness. While I usually felt physically invigorated by my walks, even more satisfying were the psychological rewards. Walking cleared my head and brightened my spirits in a way no other exercise routine ever had.\n\n[1] Walking slowed my often frenetic pace. [2] I was trying to go too fast. [3] In spring, I'd rejoice in the first crocuses emerging out the snow, the faint misting of green on tree branches just beginning to bud, the colorful explosion of tulips and daffodils. [4] I anticipated crisp fall days and the crackle of leaves in my path. [5] As the lushness of summer gradually unfolded, I noticed for what seemed like the first time the homey smell of freshly mown grass and the warmth of sunlight on my face. [6] Even in bitter winter, I treasured my walking time, and after a stressful day a stroll to decompress myself was often craved, I found.\n\nI've thought many times of the instinctive way our bodies respond to the beat of music by wanting to get up and dance, or how a parent quiets a crying baby by walking back and forth. I think that at some deep level we humans need steady rhythmic, movement to feel centered and content.\n\nSo now when I want to escape the busyness of my life, I take a walk. No matter how far I go, I know that I will return refreshed in both body and mind.","questions":[{"id":"p1q1","tested":"and how boring they were","stem":"The writer is considering deleting the phrase \"and how boring they were\" from the preceding sentence (placing a period after the word well). Should the writer make this deletion?","category":"Redundancy & Wordiness","choices":["Yes, because the phrase unnecessarily repeats a point made earlier in the sentence.","Yes, because the sentence is more detailed without the phrase.","No, because the phrase describes one of the challenges of exercise.","No, because the phrase provides new and relevant information about exercise."],"correct":0,"explanation":"The phrase \"and how boring they were\" repeats the idea already expressed by \"bored\" earlier in the sentence. Cutting it tightens the writing."},{"id":"p1q2","tested":"Fitting it into my","stem":"Question 2","category":"Punctuation","choices":["NO CHANGE","walk. Which fit","walk; with fitting","walk, fitting"],"correct":3,"explanation":"The original creates a sentence fragment (\"Fitting it into my schedule whenever I could.\"). A comma after \"walk\" correctly joins the participial phrase to the preceding clause."},{"id":"p1q3","tested":"Running errands and visiting","stem":"Question 3","category":"Punctuation","choices":["NO CHANGE","errands, and","errands, and,","errands and,"],"correct":0,"explanation":"No comma is needed between \"errands\" and \"and\" here — the two items joined (running errands, visiting friends) form a simple compound without needing extra punctuation."},{"id":"p1q4","tested":"if I walked would take longer to my destination,","stem":"The best placement for the underlined portion would be:","category":"Transitions & Logical Flow","choices":["where it is now.","after the word longer.","after the word myself.","after the word body."],"correct":1,"explanation":"Placing \"if I walked\" after \"longer\" makes the conditional clause modify the right idea: that walking would take longer."},{"id":"p1q5","tested":"A funny thing happened on my way to fitness.","stem":"The writer is considering deleting the preceding sentence. If the writer were to make this deletion, the paragraph would primarily lose:","category":"Transitions & Logical Flow","choices":["a shift in the subject from exercise to humor.","the writer's summary of the benefits of walking.","a signal that something new and unexpected will follow.","a principal illustration of the relationship between the writer and exercise."],"correct":2,"explanation":"The sentence \"A funny thing happened\" signals a turn — something unexpected is coming. Without it, the paragraph shift feels abrupt."},{"id":"p1q6","tested":"While I usually felt physically invigorated by my walks,","stem":"Which choice most effectively introduces the description that follows in this paragraph?","category":"Transitions & Logical Flow","choices":["NO CHANGE","had time to savor the changes in seasons.","tried to walk at the same time every day.","fit a walk into my schedule."],"correct":0,"explanation":"The contrast between physical invigoration and even greater psychological rewards is set up perfectly by the NO CHANGE option."},{"id":"p1q7","tested":"emerging out the snow,","stem":"Question 7","category":"Redundancy & Wordiness","choices":["NO CHANGE","from out","outside","from"],"correct":3,"explanation":"\"Emerging from the snow\" is the correct idiomatic expression. \"Out\" alone or \"from out\" are nonstandard here."},{"id":"p1q8","tested":"and the crackle of leaves in my path.","stem":"Given that all the choices are true, which one best illustrates the narrator's appreciation of nature?","category":"Transitions & Logical Flow","choices":["NO CHANGE","when noisy birds would be gone from the gardens.","with woolen sweaters and warm gloves.","and the chance to imagine next summer's activities."],"correct":0,"explanation":"\"The crackle of leaves in my path\" is a vivid sensory detail that best illustrates appreciation of nature. The other options focus on clothing or abstract thoughts."},{"id":"p1q9","tested":"a stroll to decompress myself was often craved, I found.","stem":"Question 9","category":"Redundancy & Wordiness","choices":["NO CHANGE","I found myself craving a stroll to decompress often.","I often found myself craving a stroll to decompress.","to decompress myself often I found I craved a stroll."],"correct":2,"explanation":"Choice C is the clearest and most direct phrasing. The original is awkwardly constructed with the verb at the end."},{"id":"p1q10","tested":"[5] As the lushness of summer gradually unfolded,","stem":"For the sake of the logic and coherence of this paragraph, Sentence 5 should be placed:","category":"Transitions & Logical Flow","choices":["where it is now.","after Sentence 2.","after Sentence 3.","after Sentence 6."],"correct":2,"explanation":"The paragraph describes seasons in order: spring (S3), then summer (S5), then fall (S4), then winter (S6). Moving S5 after S3 puts summer in the correct seasonal sequence."},{"id":"p1q11","tested":"instinctive","stem":"Which of the following alternatives to the underlined portion would NOT be acceptable?","category":"Redundancy & Wordiness","choices":["spontaneous","unconscious","involuntary","automatically"],"correct":3,"explanation":"\"Automatically\" is an adverb and cannot replace the adjective \"instinctive\" before the noun \"way.\""},{"id":"p1q12","tested":"or how","stem":"Question 12","category":"Transitions & Logical Flow","choices":["NO CHANGE","for example,","meanwhile","then"],"correct":0,"explanation":"\"Or how\" correctly continues the parallel list of examples (the beat of music... or how a parent...). The other transitions break the parallel structure."},{"id":"p1q13","tested":"steady rhythmic,","stem":"Question 13","category":"Punctuation","choices":["NO CHANGE","steady rhythmic","steady, rhythmic,","steady; rhythmic"],"correct":2,"explanation":"Two coordinate adjectives modifying \"movement\" should be separated by a comma: \"steady, rhythmic, movement\" — or the comma after \"rhythmic\" can be omitted. The best answer here is C with the comma between the adjectives."},{"id":"p1q14","tested":"refreshed in","stem":"Question 14","category":"Verb Tense & Mood","choices":["NO CHANGE","refreshing in","a refreshment of","refreshed with"],"correct":0,"explanation":"\"Return refreshed\" uses an adjective complement correctly — the walker returns in a refreshed state. The other options are grammatically awkward."},{"id":"p1q15","tested":"","stem":"Suppose the writer's goal had been to write a brief essay illustrating some of the benefits that walking can provide. Would this essay successfully fulfill the writer's goal?","category":"Transitions & Logical Flow","choices":["Yes, because the essay offers some of the positive effects of walking.","Yes, because the essay encourages readers to get out and walk.","No, because the essay presents reasons for walking, rather than the rewards.","No, because the essay is limited to the physical benefits of walking."],"correct":0,"explanation":"The essay does illustrate benefits — psychological rewards, clearing the head, brightening spirits. Answer A is correct. B overstates; the essay doesn't urge readers to walk. C is wrong because the essay does discuss rewards. D is wrong because the essay emphasizes psychological, not just physical, benefits."}]},{"id":"p2","title":"PASSAGE II — A Family Craft","text":"The printshops where my father worked, whether in a publishing house in Vermont or in a small-town newspaper office in Idaho, always presented the same vivid experience. The tap dance of Linotype keys the pungent scents of printing ink and cleaning chemicals, and the slapping sound of the rollers dripping with ink— every job has its hazards.\n\nIt was a special occasion for which I could visit my father at work. However, he was a Linotype operator and, the Linotype machine seemed formidable. My father's hands flew across an enormous keyboard that was unlike any I saw in other places. As he typed, the machine melted chunks of metal and then formed the molten mass into lines of metal type, bright and burning hot, these lines of type—headlines, sentences, phrases—slid out of the machine. Once cooled, these slugs (as the lines of type are called) were taken to a table where the typesetter fit them together by hand into a wooden frame the size of a newspaper page. The frame was set into the printing press, inked, and used to print pages. Afterward, the type was cleaned in various chemicals and were put back into the Linotype to be re-created as tomorrow's headlines and stories.\n\nIn the early seventies, the Linotype process was phased out, and my father went to work in the business office. His company had switched to offset printing, a method that relies on photographic images rather than metal type. Since then, computers have further revolutionized the printing industry. When I process text at my computer, in my job, I remember my father at his Linotype machine. When comparing his workplace to mine, it is quiet and clean. The air smells of coffee, not tea. Instead of stained and scuffed wooden tables, I'm surrounded by sleek vinyl office furniture. But in essence, my father's work and mine are the most alike. From him, I inherited faithfulness to the written word and care in sending it out into the world.","questions":[{"id":"p2q1","tested":"Linotype keys the pungent","stem":"Question 16","category":"Punctuation","choices":["NO CHANGE","keys;","keys,","keys—"],"correct":2,"explanation":"A comma after \"keys\" is needed to separate the first item in the list (the tap dance of Linotype keys) from the second (the pungent scents). A dash would work too but the comma is the standard choice here."},{"id":"p2q2","tested":"every job has its hazards.","stem":"Given that all the choices are true, which one best helps establish this essay as a nostalgic tribute?","category":"Transitions & Logical Flow","choices":["NO CHANGE","these machines are very expensive.","ink stains are hard to remove.","many such details remain with me."],"correct":3,"explanation":"\"Many such details remain with me\" establishes that this is a personal, nostalgic recollection. The other options introduce irrelevant or non-nostalgic information."},{"id":"p2q3","tested":"for which I could","stem":"Question 18","category":"Pronoun Agreement","choices":["NO CHANGE","which","when","where"],"correct":2,"explanation":"\"When\" correctly refers to time (the occasion when I could visit). \"For which\" is awkward and \"where\" refers to place, not occasion."},{"id":"p2q4","tested":"However, he was a Linotype","stem":"Question 19","category":"Transitions & Logical Flow","choices":["NO CHANGE","He, on the other hand,","Gradually, he","He"],"correct":3,"explanation":"No transition word is needed — the sentence simply introduces the father's role. \"However\" and \"on the other hand\" imply a contrast that doesn't exist here."},{"id":"p2q5","tested":"operator and, the Linotype machine","stem":"Question 20","category":"Punctuation","choices":["NO CHANGE","operator and the Linotype machine,","operator, and the Linotype machine,","operator, and the Linotype machine"],"correct":2,"explanation":"A comma before \"and\" correctly separates the two independent clauses: \"he was a Linotype operator\" and \"the Linotype machine seemed formidable.\""},{"id":"p2q6","tested":"unlike any I saw in other places.","stem":"Given that all the choices are true, which one provides details that best help the reader visualize the keyboard?","category":"Transitions & Logical Flow","choices":["NO CHANGE","something amazing to behold.","like several typewriter keyboards spliced together.","like the alphabet right there just waiting to be turned into words."],"correct":2,"explanation":"\"Like several typewriter keyboards spliced together\" gives the reader a concrete visual comparison. The other options are vague or abstract."},{"id":"p2q7","tested":"type, bright and burning","stem":"Question 22","category":"Punctuation","choices":["NO CHANGE","type, then bright","type, they were bright","type. Bright"],"correct":0,"explanation":"\"Bright and burning hot\" is an appositive phrase describing the lines of type. NO CHANGE correctly uses a comma to set off this descriptive phrase."},{"id":"p2q8","tested":"were put","stem":"Question 23","category":"Redundancy & Wordiness","choices":["NO CHANGE","put","they were put","OMIT the underlined portion."],"correct":1,"explanation":"The subject is \"the type\" (singular implied), so the simple past \"put\" is correct and parallel with \"cleaned\" earlier in the sentence."},{"id":"p2q9","tested":"back into the Linotype to be re-created","stem":"Question 24","category":"Punctuation","choices":["NO CHANGE","Linotype. To be re-created","Linotype. Then re-created","Linotype. His job to re-create"],"correct":0,"explanation":"NO CHANGE correctly uses an infinitive phrase \"to be re-created\" as a purpose modifier. The other options create fragments or change the meaning."},{"id":"p2q10","tested":"in my job,","stem":"Given that all the choices are true, which one provides information that is most relevant to the contrast being established between the father's profession and the narrator's?","category":"Transitions & Logical Flow","choices":["NO CHANGE","as the editor of an Internet magazine,","now that I have a career of my own,","in my professional capacity,"],"correct":0,"explanation":"\"In my job\" is the simplest and most direct contrast with the father's job. The other options add irrelevant or wordy detail."},{"id":"p2q11","tested":"When comparing his workplace to mine, it is quiet and clean.","stem":"Question 26","category":"Pronoun Agreement","choices":["NO CHANGE","Making a comparison between his workplace and mine, it is quiet and clean.","Compared to his workplace, my office is quiet and clean.","Quiet and clean compared to his workplace, which isn't."],"correct":2,"explanation":"The original and B have dangling modifiers — \"it\" doesn't clearly refer to anything. C correctly names \"my office\" as the subject."},{"id":"p2q12","tested":"not tea.","stem":"Which choice is most consistent with the subject of the essay?","category":"Transitions & Logical Flow","choices":["NO CHANGE","an aroma that I like.","not ink.","all day."],"correct":2,"explanation":"The essay contrasts the narrator's workspace with her father's print shop, which smelled of ink. \"Not ink\" directly continues that contrast."},{"id":"p2q13","tested":"in essence,","stem":"Which of the following alternatives to the underlined portion would NOT be acceptable?","category":"Redundancy & Wordiness","choices":["essentially,","in essentially,","fundamentally,","for the most part,"],"correct":1,"explanation":"\"In essentially\" is not standard English — it combines a preposition with an adverb incorrectly. All the other options are acceptable substitutes."},{"id":"p2q14","tested":"the most alike.","stem":"Question 29","category":"Redundancy & Wordiness","choices":["NO CHANGE","the same.","more of the same.","like the same."],"correct":0,"explanation":"\"Most alike\" is the correct superlative form here. \"The same\" changes the meaning slightly; \"more of the same\" and \"like the same\" are awkward."},{"id":"p2q15","tested":"","stem":"Suppose one of the writer's goals had been to write an essay that reveals a connection between her profession and her father's. Would this essay fulfill that goal?","category":"Transitions & Logical Flow","choices":["Yes, because the essay indicates that the narrator sees a similarity between her work with the written word and her father's.","Yes, because the essay shows how the narrator learned to operate a Linotype machine as a child and later went into a job at a printing press.","No, because the essay indicates that the narrator chose a different career from that of her father, even though she admired his Linotype skills.","No, because the essay focuses on how a Linotype machine operates, not on how the narrator chose her line of work."],"correct":0,"explanation":"The essay explicitly connects both workers' devotion to the written word. F is correct. G is factually wrong. H misreads the essay. J is wrong because the essay does address the narrator's career."}]},{"id":"p3","title":"PASSAGE III — Coretta Scott King: An Unexpected Turn","text":"As a child, Coretta Scott loved to sing and play the piano. Born in 1927 in Marion, Alabama, the daughter of a successful truck farmer, she became a top student in grade school and was often asked to lead the class in song. Her parents encouraged her to study diligently and responded to her special interests with piano and voice lessons.\n\n[1] After finishing high school, Coretta Scott attended Antioch College in Ohio. [2] After college, she enrolled in Boston's New England Conservatory of Music, where her studies, she hoped, would lead to a degree in voice and a celebrated concert singer. [3] It was there that her life took an unexpected turn when she met a doctoral student at Boston University's School of Theology, Martin Luther King, Jr. [4] She graduated from Antioch in 1951 with a degree upon finishing a program of study in music and elementary education.\n\nSoon after their marriage in 1953, the Kings moved to Montgomery, Alabama, where the Reverend Dr. King began his first church assignment. Their first child was born in 1955, just three weeks before Dr. King has led the historic Montgomery bus boycott. During these years, Coretta Scott King became a calm, forceful presence, in the civil rights movement.\n\nEven as she fulfilled the duties of pastor's wife, she was steady and unwavering. In 1956, after their home was bombed, supporters were told how much his wife's strength had helped him through that incident.\n\nIn the mid-sixties, Coretta Scott King began to take on a more active role in the movement, which after her husband's assassination in 1968, she helped carry on the cause of racial and economic justice. As founder of the Martin Luther King, Jr. Center for Nonviolent Social Change, the work continues to fulfill the goals of peace and justice.\n\nOne of the great stories of the civil rights movement have been that Coretta Scott King might have become a great concert singer if things were different.","questions":[{"id":"p3q1","tested":"she became","stem":"Question 31","category":"Pronoun Agreement","choices":["NO CHANGE","who became","and","OMIT the underlined portion."],"correct":0,"explanation":"\"She became\" correctly continues the sentence describing Coretta Scott. The other options either create awkward constructions or omit necessary information."},{"id":"p3q2","tested":"Antioch College in Ohio.","stem":"Which of the following alternatives to the underlined portion would NOT be acceptable?","category":"Punctuation","choices":["College where its location is","College, which is located","College, which is","College, located"],"correct":0,"explanation":"\"College where its location is\" is redundant and ungrammatical. All other options are acceptable relative clause constructions."},{"id":"p3q3","tested":"a celebrated concert singer.","stem":"Question 33","category":"Redundancy & Wordiness","choices":["NO CHANGE","career as a","professional","OMIT the underlined portion."],"correct":3,"explanation":"The phrase \"a celebrated concert singer\" is redundant with the degree in voice already mentioned. Omitting it makes the sentence cleaner."},{"id":"p3q4","tested":"with a degree upon finishing a program of study","stem":"Question 34","category":"Redundancy & Wordiness","choices":["NO CHANGE","by receiving both a diploma and an academic degree","with a degree, having received a diploma","with a degree"],"correct":3,"explanation":"\"With a degree\" is the most concise option. The original is wordy; B and C add redundant information."},{"id":"p3q5","tested":"","stem":"Which of the following sequences of sentences makes this paragraph most logical?","category":"Transitions & Logical Flow","choices":["NO CHANGE (1,2,3,4)","1, 4, 2, 3","2, 3, 1, 4","3, 2, 1, 4"],"correct":1,"explanation":"The logical order is: high school (1), then graduation from Antioch (4), then conservatory (2), then meeting King (3). Order 1,4,2,3 follows the chronology correctly."},{"id":"p3q6","tested":"Dr. King has led","stem":"Question 36","category":"Verb Tense & Mood","choices":["NO CHANGE","leads","lead","led"],"correct":3,"explanation":"The past tense \"led\" is required — the Montgomery bus boycott is a historical event being described in the past tense narrative."},{"id":"p3q7","tested":"a calm, forceful presence,","stem":"Question 37","category":"Punctuation","choices":["NO CHANGE","calm, forceful presence","calm, forceful, presence","calm forceful presence,"],"correct":0,"explanation":"NO CHANGE is correct. A comma after \"presence\" sets off the prepositional phrase \"in the civil rights movement.\" The comma between \"calm\" and \"forceful\" correctly separates two coordinate adjectives."},{"id":"p3q8","tested":"Even as she fulfilled the duties of pastor's wife, she was steady and unwavering.","stem":"The writer wants to provide a statement here that will contrast with, and thus highlight, the statement that follows. Which one would best accomplish this?","category":"Transitions & Logical Flow","choices":["NO CHANGE","While she traveled to Europe, Africa, and India with her husband,","Although danger always threatened their lives,","Organizing a series of Freedom Concerts,"],"correct":1,"explanation":"The following sentence describes her strength during crisis. A contrast with traveling — a more peaceful activity — best highlights the dramatic shift to the bombing."},{"id":"p3q9","tested":"supporters were told","stem":"Question 39","category":"Verb Tense & Mood","choices":["NO CHANGE","supporters were being told","Dr. King told supporters","it was told"],"correct":0,"explanation":"NO CHANGE maintains the passive voice consistently used in this part of the passage. The other options shift voice or person awkwardly."},{"id":"p3q10","tested":"","stem":"At this point, the writer is considering adding: \"In 1957, Dr. and Mrs. King celebrated their belated honeymoon in Mexico.\" Should the writer add this sentence?","category":"Transitions & Logical Flow","choices":["Yes, because it describes an important event in the life of Coretta Scott King.","Yes, because it shows how busy Dr. and Mrs. King were at that time.","No, because it doesn't follow the chronological order of this narrative.","No, because it distracts readers from the main focus of this paragraph."],"correct":3,"explanation":"The paragraph focuses on Coretta's strength and courage during danger. The honeymoon detail is off-topic and distracts from that focus."},{"id":"p3q11","tested":"the movement, which after her husband's assassination","stem":"Question 41","category":"Punctuation","choices":["NO CHANGE","movement, and","movement,","movement"],"correct":2,"explanation":"A comma after \"movement\" correctly sets off the following clause. \"Which\" without the comma creates an awkward relative clause, and \"and\" changes the meaning."},{"id":"p3q12","tested":"","stem":"Which one, if added here, would provide the most relevant addition to this paragraph about Coretta's role after 1968?","category":"Transitions & Logical Flow","choices":["In 1964, he had been awarded the Nobel Peace Prize for his civil rights work.","She also worked as a voice instructor in the music department of Morris Brown College.","She led the campaign to establish a national holiday to honor her late husband and his work.","He had influenced the passage of the 1964 Civil Rights Act and the 1965 Voting Rights Bill."],"correct":2,"explanation":"The paragraph is about Coretta's active role after her husband's death. H — her campaign for a national holiday — is directly relevant to her continuing his legacy."},{"id":"p3q13","tested":"the work continues","stem":"Question 43","category":"Pronoun Agreement","choices":["NO CHANGE","she continues to work","the work is continuing","the ongoing work"],"correct":1,"explanation":"The subject of the sentence should be Coretta Scott King, not \"the work.\" \"She continues to work\" correctly maintains her as the subject."},{"id":"p3q14","tested":"civil rights movement have been","stem":"Question 44","category":"Subject-Verb Agreement","choices":["NO CHANGE","were","are","is"],"correct":3,"explanation":"The subject is \"One\" (singular), so the verb must be singular: \"One...is.\" \"Have been\" and \"were\" are plural and incorrect."},{"id":"p3q15","tested":"","stem":"Which choice would best complete this sentence by providing an accurate and effective summary of the essay?","category":"Transitions & Logical Flow","choices":["NO CHANGE — great concert singer if things were different.","the work and leadership of Dr. King continue to have an effect on the world.","the perseverance of many extraordinary people led to change in the United States.","this musically gifted young woman developed into a leader of national stature."],"correct":3,"explanation":"The essay is about Coretta Scott King's personal transformation from aspiring musician to civil rights leader. D best captures that arc. A is vague; B focuses on Dr. King; C is too broad."}]},{"id":"p4","title":"PASSAGE IV — Voice of the People","text":"Harriett Woods did not plan to be a politician, but in 1984 she was elected lieutenant governor of Missouri. Her first job had been as a newspaper reporter she had moved to St. Louis to write for the Globe-Democrat, which shut down years ago. In 1953 she was to marry a fellow reporter and left the newspaper to raise their children.\n\nInterestingly, her children's needs prompted Woods's first political action. Each afternoon, Woods put her babies in bed for their naps, a time she cherished for her own reading and personal literary scholarship. Each afternoon, trucks drove over a loose utility-hole cover, and the clanking and clamorous noisemaking awoke the boys.\n\nWoods appealed on her city council to close the street to trucks, but the council stalled. She sought her neighbors' support by going door-to-door and gathering their signatures on a petition.\n\nWhen Woods called a local television station to seek a writing job, she was asked to moderate a panel discussion on local politics. She became a regular moderator, a job that led to her becoming head of public affairs at another television station. She continued her grassroots politics, focusing on the fight for fair housing.\n\nAs a result of her success to bring community members into the legislative process, Woods was asked to fill a vacant seat on the city council. This was the start of her political career and led to her election as a state senator in 1976. Then she became the first woman in Missouri history, to hold a statewide office when she was elected lieutenant governor.\n\nAlthough she narrowly lost bids for the U.S. Senate in 1982 and 1986, Woods's campaigns earned their national recognition. Because of Woods's history of public outreach and community partnership, she was named president of the National Women's Political Caucus, an organization that seeks to bring women into the political process. After she retired, Woods wrote Stepping Up to Power, a book about her political life, which all began when she asked her neighbors how they wanted to be governed.","questions":[{"id":"p4q1","tested":"reporter she had moved","stem":"Question 46","category":"Punctuation","choices":["NO CHANGE","reporter; she had moved","reporter, she had moved;","reporter, she had moved"],"correct":3,"explanation":"A comma after \"reporter\" is needed to join the two independent clauses. A semicolon before \"she\" with no comma after \"reporter\" (option G) is also grammatically acceptable, but J is the best answer here."},{"id":"p4q2","tested":"Globe-Democrat, which shut down years ago.","stem":"Question 47","category":"Redundancy & Wordiness","choices":["NO CHANGE","Globe-Democrat, one of the many newspapers in this bustling city.","Globe-Democrat, which is not in operation anymore.","Globe-Democrat."],"correct":3,"explanation":"The information that the paper shut down is not relevant to the essay's focus on Woods's career. Omitting it (D) keeps the sentence focused."},{"id":"p4q3","tested":"she was to marry","stem":"Question 48","category":"Verb Tense & Mood","choices":["NO CHANGE","would marry","married","would be married to"],"correct":2,"explanation":"Simple past \"married\" is the correct tense for a completed past action. \"Was to marry\" implies future intention from a past perspective, which is awkward here."},{"id":"p4q4","tested":"and personal literary scholarship.","stem":"Question 49","category":"Redundancy & Wordiness","choices":["NO CHANGE","and investigation of written texts.","and relaxation with books.","OMIT the underlined portion and end the sentence with a period."],"correct":3,"explanation":"\"Personal literary scholarship\" is pretentious and out of tone with the rest of the essay. Omitting it keeps the sentence natural and focused."},{"id":"p4q5","tested":"clanking and clamorous noisemaking","stem":"Question 50","category":"Redundancy & Wordiness","choices":["NO CHANGE","clanking noise","noisy sound of loud clanking","racket of the clanking sound"],"correct":1,"explanation":"\"Clanking noise\" is concise. The original is redundant (clanking and clamorous both describe noise). C and D are also redundant."}]}],"standalones":[]};
+
+let data = { passages: [], standalones: [] };
+
+function loadData() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORE));
+    // Use saved data if it has content, otherwise use builtin
+    if (saved && (saved.passages.length || saved.standalones.length)) {
+      data = saved;
+    } else {
+      data = JSON.parse(JSON.stringify(BUILTIN));
+    }
+  } catch(e) {
+    data = JSON.parse(JSON.stringify(BUILTIN));
+  }
+}
+function saveData() { localStorage.setItem(STORE, JSON.stringify(data)); }
+loadData();
+
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function toast(msg) {
+  const el = document.getElementById('toast-el');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2400);
+}
+
+// ── mode ──
+function switchMode(mode) {
+  document.getElementById('tutor-mode').style.display  = mode==='tutor' ? 'block' : 'none';
+  document.getElementById('student-mode').style.display = mode==='student' ? 'block' : 'none';
+  document.getElementById('btn-tutor').classList.toggle('active', mode==='tutor');
+  document.getElementById('btn-student').classList.toggle('active', mode==='student');
+  if (mode==='tutor') renderTutor();
+  if (mode==='student') initStudent();
+}
+
+// ════════════════════════════════════════
+// TUTOR
+// ════════════════════════════════════════
+let editingPassageId = null;
+let editingQuestionId = null;
+let activePassageId = null; // which passage we're adding a question to
+let editingStandaloneId = null;
+let selCorrectIdx = null;
+let selSCorrectIdx = null;
+
+function renderTutor() {
+  // count
+  const totalQ = data.passages.reduce((s,p)=>s+p.questions.length,0) + data.standalones.length;
+  const pCount = data.passages.length;
+  document.getElementById('bank-count').textContent =
+    pCount + ' passage' + (pCount!==1?'s':'') + ', ' + totalQ + ' question' + (totalQ!==1?'s':'') + ' total';
+
+  // passages
+  const pb = document.getElementById('passage-bank');
+  if (!data.passages.length) {
+    pb.innerHTML = '<div class="empty-bank" style="margin-bottom:16px;">No passages yet — hit "New Passage" to get started.</div>';
+  } else {
+    pb.innerHTML = data.passages.map(p => renderPassageCard(p)).join('');
+  }
+
+  // standalones
+  const sb = document.getElementById('standalone-bank');
+  const ss = document.getElementById('standalone-section');
+  if (!data.standalones.length) {
+    ss.style.display = 'none';
+  } else {
+    ss.style.display = 'block';
+    sb.innerHTML = data.standalones.map(q => `
+      <div class="q-row">
+        <div class="q-row-body">
+          <div class="q-row-stem">${esc(q.stem || 'Which is the best version of the underlined portion?')}</div>
+          <div class="q-row-meta"><span style="background:var(--cream);padding:1px 6px;border:1px solid var(--rule);border-radius:1px;margin-right:5px;">${esc(q.category)}</span>${esc((q.sentence||'').slice(0,50))}…</div>
+        </div>
+        <div class="q-row-actions">
+          <button class="icon-btn" onclick="editStandalone('${q.id}')">Edit</button>
+          <button class="icon-btn del" onclick="deleteStandalone('${q.id}')">✕</button>
+        </div>
+      </div>`).join('');
+  }
+}
+
+function renderPassageCard(p) {
+  const qList = p.questions.length
+    ? p.questions.map(q => `
+        <div class="q-row">
+          <div class="q-row-body">
+            <div class="q-row-stem">${esc(q.stem || 'Which is the best version of the underlined portion?')}</div>
+            <div class="q-row-meta">
+              <span style="background:var(--cream);padding:1px 6px;border:1px solid var(--rule);border-radius:1px;margin-right:5px;">${esc(q.category)}</span>
+              Tested: "<em>${esc(q.tested)}</em>"
+            </div>
+          </div>
+          <div class="q-row-actions">
+            <button class="icon-btn" onclick="editQuestion('${p.id}','${q.id}')">Edit</button>
+            <button class="icon-btn del" onclick="deleteQuestion('${p.id}','${q.id}')">✕</button>
+          </div>
+        </div>`).join('')
+    : '<div style="font-size:.83rem;color:#a89878;font-style:italic;padding:8px 0;">No questions yet for this passage.</div>';
+
+  return `
+  <div class="passage-card" id="pc-${p.id}">
+    <div class="passage-card-header" onclick="toggleCard('${p.id}')">
+      <div class="pch-body">
+        <div class="pch-title">${esc(p.title || 'Untitled Passage')}</div>
+        <div class="pch-meta">${p.questions.length} question${p.questions.length!==1?'s':''} · ${esc((p.text||'').slice(0,60))}…</div>
+      </div>
+      <span class="pch-chevron" id="chev-${p.id}">▶</span>
+    </div>
+    <div class="passage-card-body" id="pcb-${p.id}">
+      <div class="passage-preview">${esc(p.text)}</div>
+      <div class="questions-list">${qList}</div>
+      <div class="passage-card-footer">
+        <button class="btn-ghost" onclick="openQuestionForm('${p.id}')">+ Add Question</button>
+        <button class="icon-btn" onclick="editPassage('${p.id}')">Edit Passage Text</button>
+        <button class="icon-btn del" onclick="deletePassage('${p.id}')">Delete Passage</button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function toggleCard(id) {
+  const body = document.getElementById('pcb-'+id);
+  const chev = document.getElementById('chev-'+id);
+  const open = body.classList.toggle('open');
+  chev.classList.toggle('open', open);
+}
+
+// ── passage form ──
+function openPassageForm(pid) {
+  editingPassageId = pid || null;
+  document.getElementById('pf-title').textContent = editingPassageId ? 'Edit Passage' : 'New Passage';
+  if (editingPassageId) {
+    const p = data.passages.find(x=>x.id===editingPassageId);
+    document.getElementById('pf-title-input').value = p.title || '';
+    document.getElementById('pf-text').value = p.text || '';
+  } else {
+    document.getElementById('pf-title-input').value = '';
+    document.getElementById('pf-text').value = '';
+  }
+  document.getElementById('passage-form').style.display = 'block';
+  closeQuestionForm(); closeStandaloneForm();
+  setTimeout(()=>document.getElementById('passage-form').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+function closePassageForm() { document.getElementById('passage-form').style.display='none'; editingPassageId=null; }
+function editPassage(id) { openPassageForm(id); }
+function deletePassage(id) {
+  const p = data.passages.find(x=>x.id===id);
+  if (!confirm(`Delete passage "${p.title||'Untitled'}" and all its questions?`)) return;
+  data.passages = data.passages.filter(x=>x.id!==id);
+  saveData(); renderTutor(); toast('Passage deleted.');
+}
+function savePassage() {
+  const title = document.getElementById('pf-title-input').value.trim();
+  const text  = document.getElementById('pf-text').value.trim();
+  if (!text) { toast('Please enter the passage text.'); return; }
+  if (editingPassageId) {
+    const p = data.passages.find(x=>x.id===editingPassageId);
+    p.title = title; p.text = text;
+  } else {
+    const newP = { id:uid(), title, text, questions:[] };
+    data.passages.push(newP);
+    editingPassageId = newP.id;
+  }
+  const savedId = editingPassageId;
+  saveData(); closePassageForm(); renderTutor();
+  // auto-open the card and question form
+  setTimeout(()=>{ toggleCard(savedId); openQuestionForm(savedId); }, 100);
+  toast('Passage saved! Now add questions below.');
+}
+
+// ── question form (for passage) ──
+function openQuestionForm(passageId, qid) {
+  activePassageId = passageId;
+  editingQuestionId = qid || null;
+  const p = data.passages.find(x=>x.id===passageId);
+  document.getElementById('qf-title').textContent = qid ? 'Edit Question' : 'Add Question to: ' + (p.title||'Untitled Passage');
+  document.getElementById('qf-passage-context').textContent = (p.text||'').slice(0,200)+'…';
+  selCorrectIdx = null;
+  document.querySelectorAll('#question-form .correct-btn').forEach(b=>b.classList.remove('sel'));
+  if (qid) {
+    const q = p.questions.find(x=>x.id===qid);
+    document.getElementById('qf-tested').value   = q.tested||'';
+    document.getElementById('qf-stem').value     = q.stem||'';
+    document.getElementById('qf-category').value = q.category||'Punctuation';
+    ['qc0','qc1','qc2','qc3'].forEach((id,i)=>document.getElementById(id).value=(q.choices||[])[i]||'');
+    document.getElementById('qf-expl').value = q.explanation||'';
+    selCorrect(q.correct);
+  } else {
+    ['qf-tested','qf-stem','qf-expl','qc0','qc1','qc2','qc3'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('qf-category').value='Punctuation';
+  }
+  document.getElementById('question-form').style.display='block';
+  closePassageForm(); closeStandaloneForm();
+  setTimeout(()=>document.getElementById('question-form').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+function closeQuestionForm() { document.getElementById('question-form').style.display='none'; editingQuestionId=null; activePassageId=null; }
+function editQuestion(pid,qid) { openQuestionForm(pid,qid); }
+function deleteQuestion(pid,qid) {
+  if (!confirm('Delete this question?')) return;
+  const p = data.passages.find(x=>x.id===pid);
+  p.questions = p.questions.filter(x=>x.id!==qid);
+  saveData(); renderTutor(); toast('Question deleted.');
+}
+function selCorrect(idx) {
+  selCorrectIdx=idx;
+  document.querySelectorAll('#question-form .correct-btn').forEach((b,i)=>b.classList.toggle('sel',i===idx));
+}
+function saveQuestion() {
+  if (!activePassageId) return;
+  const p = data.passages.find(x=>x.id===activePassageId);
+  const tested = document.getElementById('qf-tested').value.trim();
+  const choices = ['qc0','qc1','qc2','qc3'].map(id=>document.getElementById(id).value.trim());
+  if (!tested) { toast('Enter the tested phrase.'); return; }
+  if (choices.filter(Boolean).length<2) { toast('Enter at least 2 choices.'); return; }
+  if (selCorrectIdx===null) { toast('Select the correct answer.'); return; }
+  if (!choices[selCorrectIdx]) { toast('The selected answer is empty.'); return; }
+  if (tested && !p.text.includes(tested)) { toast('⚠️ Tested phrase not found in passage text. Check for typos.'); return; }
+  const q = {
+    id: editingQuestionId || uid(),
+    tested, stem: document.getElementById('qf-stem').value.trim(),
+    category: document.getElementById('qf-category').value,
+    choices, correct: selCorrectIdx,
+    explanation: document.getElementById('qf-expl').value.trim()
+  };
+  if (editingQuestionId) {
+    const idx = p.questions.findIndex(x=>x.id===editingQuestionId);
+    p.questions[idx] = q;
+  } else { p.questions.push(q); }
+  saveData(); renderTutor(); closeQuestionForm();
+  toggleCard(activePassageId||p.id);
+  toast('Question saved!');
+}
+
+// ── standalone form ──
+function openStandaloneForm(sid) {
+  editingStandaloneId = sid||null;
+  document.getElementById('sf-title').textContent = sid ? 'Edit Sentence Question' : 'New Sentence Question';
+  selSCorrectIdx=null;
+  document.querySelectorAll('#standalone-form .correct-btn').forEach(b=>b.classList.remove('sel'));
+  if (sid) {
+    const q=data.standalones.find(x=>x.id===sid);
+    document.getElementById('sf-sentence').value=q.sentence||'';
+    document.getElementById('sf-stem').value=q.stem||'';
+    document.getElementById('sf-category').value=q.category||'Punctuation';
+    ['sc0','sc1','sc2','sc3'].forEach((id,i)=>document.getElementById(id).value=(q.choices||[])[i]||'');
+    document.getElementById('sf-expl').value=q.explanation||'';
+    selSCorrect(q.correct);
+  } else {
+    ['sf-sentence','sf-stem','sf-expl','sc0','sc1','sc2','sc3'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('sf-category').value='Punctuation';
+  }
+  document.getElementById('standalone-form').style.display='block';
+  closePassageForm(); closeQuestionForm();
+  setTimeout(()=>document.getElementById('standalone-form').scrollIntoView({behavior:'smooth',block:'start'}),50);
+}
+function closeStandaloneForm() { document.getElementById('standalone-form').style.display='none'; editingStandaloneId=null; }
+function editStandalone(id) { openStandaloneForm(id); }
+function deleteStandalone(id) {
+  if (!confirm('Delete this question?')) return;
+  data.standalones=data.standalones.filter(x=>x.id!==id);
+  saveData(); renderTutor(); toast('Deleted.');
+}
+function selSCorrect(idx) {
+  selSCorrectIdx=idx;
+  document.querySelectorAll('#standalone-form .correct-btn').forEach((b,i)=>b.classList.toggle('sel',i===idx));
+}
+function saveStandalone() {
+  const sentence=document.getElementById('sf-sentence').value.trim();
+  const choices=['sc0','sc1','sc2','sc3'].map(id=>document.getElementById(id).value.trim());
+  if (!sentence) { toast('Enter the sentence.'); return; }
+  if (choices.filter(Boolean).length<2) { toast('Enter at least 2 choices.'); return; }
+  if (selSCorrectIdx===null) { toast('Select the correct answer.'); return; }
+  if (!choices[selSCorrectIdx]) { toast('The selected answer is empty.'); return; }
+  const q={
+    id:editingStandaloneId||uid(), sentence,
+    stem:document.getElementById('sf-stem').value.trim(),
+    category:document.getElementById('sf-category').value,
+    choices, correct:selSCorrectIdx,
+    explanation:document.getElementById('sf-expl').value.trim()
+  };
+  if (editingStandaloneId) { const i=data.standalones.findIndex(x=>x.id===editingStandaloneId); data.standalones[i]=q; }
+  else data.standalones.push(q);
+  saveData(); renderTutor(); closeStandaloneForm(); toast('Question saved!');
+}
+
+// ════════════════════════════════════════
+// STUDENT
+// ════════════════════════════════════════
+// drill queue is a flat list of "items" — each item is either:
+//   { type:'passage', passage, questions:[], qIdx } — a passage set
+//   { type:'standalone', q }
+let drillFlat = []; // flat list of individual questions to answer
+let drillIdx=0, correctCount=0, answeredCount=0, catFilter='All', catStats={};
+
+function initStudent() {
+  const totalQ = data.passages.reduce((s,p)=>s+p.questions.length,0) + data.standalones.length;
+  if (!totalQ) {
+    document.getElementById('no-q-msg').style.display='block';
+    document.getElementById('drill-ui').style.display='none';
+    return;
+  }
+  document.getElementById('no-q-msg').style.display='none';
+  document.getElementById('drill-ui').style.display='block';
+  buildCatFilter();
+  resetDrill();
+}
+
+function allCategories() {
+  const cats=new Set();
+  data.passages.forEach(p=>p.questions.forEach(q=>cats.add(q.category)));
+  data.standalones.forEach(q=>cats.add(q.category));
+  return ['All',...cats];
+}
+
+function buildCatFilter() {
+  document.getElementById('cat-filter').innerHTML = allCategories().map(c=>
+    `<button class="cf-btn${c===catFilter?' active':''}" onclick="setCat('${c}')">${esc(c)}</button>`
+  ).join('');
+}
+function setCat(c) { catFilter=c; buildCatFilter(); resetDrill(); }
+
+function buildDrillFlat() {
+  // Build grouped passage sets, then interleave standalones
+  let items=[];
+  // passage questions — keep within-passage order, shuffle passages
+  let passages=[...data.passages].filter(p=>p.questions.length>0);
+  shuffle(passages);
+  passages.forEach(p=>{
+    let qs = catFilter==='All' ? [...p.questions] : p.questions.filter(q=>q.category===catFilter);
+    if (!qs.length) return;
+    qs.forEach(q=>items.push({ type:'passage', passage:p, q }));
+  });
+  // standalones
+  let sas = catFilter==='All' ? [...data.standalones] : data.standalones.filter(q=>q.category===catFilter);
+  shuffle(sas);
+  sas.forEach(q=>items.push({ type:'standalone', q }));
+  // light shuffle: keep passage questions grouped but mix passages with standalones
+  // actually just return as-is for now — passages are already grouped naturally
+  return items;
+}
+
+function shuffle(arr) { for(let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]; } }
+
+function resetDrill() {
+  drillFlat=buildDrillFlat();
+  drillIdx=0; correctCount=0; answeredCount=0; catStats={};
+  drillFlat.forEach(item=>{ const cat=item.q.category; if(!catStats[cat]) catStats[cat]={c:0,t:0}; });
+  document.getElementById('results-screen').style.display='none';
+  document.getElementById('drill-card').style.display='block';
+  updateScore(); renderCurrentQ();
+}
+
+function updateScore() {
+  document.getElementById('s-score').textContent=correctCount+' / '+answeredCount;
+  const pct=drillFlat.length ? (drillIdx/drillFlat.length)*100 : 0;
+  document.getElementById('s-progress').style.width=pct+'%';
+}
+
+function renderCurrentQ() {
+  if (drillIdx>=drillFlat.length) { showResults(); return; }
+  const item=drillFlat[drillIdx];
+  const q=item.q;
+  const letters=['A','B','C','D'];
+
+  document.getElementById('s-type-badge').textContent = item.type==='passage' ? 'Passage' : 'Sentence';
+  document.getElementById('s-type-badge').className='badge '+(item.type==='passage'?'badge-passage':'badge-sentence');
+  document.getElementById('s-cat-badge').textContent=q.category;
+  document.getElementById('s-qnum').textContent='Q '+(drillIdx+1)+' of '+drillFlat.length;
+
+  // passage progress (how many Qs are in this passage group)
+  const pp=document.getElementById('s-passage-progress');
+  if (item.type==='passage') {
+    const p=item.passage;
+    const passageQs = drillFlat.filter(x=>x.type==='passage'&&x.passage.id===p.id);
+    const posInPassage = passageQs.findIndex(x=>x===item)+1;
+    pp.style.display='block';
+    pp.textContent=`Passage: ${esc(p.title||'Untitled')}  ·  Question ${posInPassage} of ${passageQs.length}`;
+  } else { pp.style.display='none'; }
+
+  // passage or sentence display
+  const pa=document.getElementById('s-passage-area');
+  if (item.type==='passage') {
+    let html=esc(item.passage.text);
+    if (q.tested) {
+      const pat=esc(q.tested).replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+      html=html.replace(new RegExp(pat,'g'),`<span class="tested-phrase">${esc(q.tested)}</span>`);
+    }
+    pa.innerHTML=`<div class="passage-display">${html}</div>`;
+  } else {
+    pa.innerHTML=`<div class="passage-display" style="font-style:normal;">${esc(q.sentence)}</div>`;
+  }
+
+  document.getElementById('s-stem').textContent=q.stem||'Which of the following is the best version of the underlined portion?';
+
+  document.getElementById('s-choices').innerHTML=q.choices.map((c,i)=>c?`
+    <button class="choice-opt" onclick="answerQ(${i})">
+      <span class="opt-ltr">${letters[i]}</span><span>${esc(c)}</span>
+    </button>`:'').join('');
+
+  const expl=document.getElementById('s-expl');
+  expl.classList.remove('show'); expl.innerHTML='';
+  document.getElementById('s-next').classList.remove('show');
+}
+
+function answerQ(idx) {
+  const item=drillFlat[drillIdx];
+  const q=item.q;
+  answeredCount++;
+  const ok=idx===q.correct;
+  if(ok) correctCount++;
+  if(!catStats[q.category]) catStats[q.category]={c:0,t:0};
+  catStats[q.category].t++;
+  if(ok) catStats[q.category].c++;
+
+  document.querySelectorAll('.choice-opt').forEach((btn,i)=>{
+    btn.disabled=true;
+    if(i===q.correct) btn.classList.add('correct');
+    else if(i===idx&&!ok) btn.classList.add('wrong');
+  });
+
+  const letters=['A','B','C','D'];
+  const expl=document.getElementById('s-expl');
+  expl.innerHTML=`<strong>${ok?'✓ Correct.':'✗ Incorrect.'}</strong> The correct answer is <strong>${letters[q.correct]}: ${esc(q.choices[q.correct])}</strong>.${q.explanation?'<br><br>'+esc(q.explanation):''}`;
+  expl.classList.add('show');
+
+  drillIdx++;
+  updateScore();
+  document.getElementById('s-next').classList.add('show');
+}
+
+function nextQ() {
+  document.getElementById('s-next').classList.remove('show');
+  if(drillIdx>=drillFlat.length) { showResults(); return; }
+  renderCurrentQ();
+}
+
+function showResults() {
+  document.getElementById('drill-card').style.display='none';
+  document.getElementById('results-screen').style.display='block';
+  const pct=answeredCount?Math.round((correctCount/answeredCount)*100):0;
+  document.getElementById('final-score-txt').textContent=correctCount+' / '+answeredCount+' ('+pct+'%)';
+  const rows=Object.entries(catStats).filter(([,v])=>v.t>0).map(([cat,v])=>{
+    const p=Math.round((v.c/v.t)*100);
+    const cls=p>=80?'good':p>=60?'ok':'bad';
+    return `<div class="bd-row"><span>${esc(cat)}</span><span class="bd-pct ${cls}">${v.c}/${v.t} (${p}%)</span></div>`;
+  }).join('');
+  document.getElementById('breakdown').innerHTML=rows||'<div class="bd-row">—</div>';
+}
+
+// ── export / import ──
+function exportBank() {
+  const json = JSON.stringify(data, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'grammar-drills-backup.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Bank exported!');
+}
+function importBank(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const imported = JSON.parse(ev.target.result);
+      if (!imported.passages || !imported.standalones) { toast('Invalid file.'); return; }
+      if (!confirm('This will replace your current question bank. Continue?')) return;
+      data = imported;
+      saveData(); renderTutor();
+      toast('Bank imported successfully!');
+    } catch(err) { toast('Could not read file.'); }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+// ── remind to export on close ──
+window.addEventListener('beforeunload', function(e) {
+  if (data.passages.length || data.standalones.length) {
+    e.preventDefault();
+    e.returnValue = '';
+  }
+});
+
+// ── init ──
+renderTutor();
+</script>
+</body>
+</html>
